@@ -24,34 +24,41 @@ proof-of-work block, a persistent ledger, and a small peer-to-peer layer
 
 ```mermaid
 flowchart LR
-    subgraph Front["Front end"]
-        CLI["cli"]
+    subgraph Front["Frontend"]
+        CLI["CLI"]
     end
-    subgraph Domain["Domain"]
-        W["wallet<br/>Keypair, Keystore"]
+
+    subgraph Domain["Domain Layer"]
+        W["Wallet<br/>Keypair / Keystore"]
         L["chain::Ledger"]
         U["chain::UtxoSet"]
         B["chain::Block"]
         T["chain::Transaction"]
     end
-    subgraph Net["Network"]
+
+    subgraph Net["Network Layer"]
         P["net::Peer"]
     end
-    S[("store (sled)")]
-    C["crypto"]
+
+    S[("Persistent Store<br/>(sled)")]
+    C["Cryptography"]
 
     CLI --> W
     CLI --> L
     CLI --> U
     CLI --> P
+
     P --> L
     P --> U
-    U --> L
+
+    L --> U
     L --> B
     B --> T
+
     W --> S
     L --> S
     U --> S
+
     T --> C
     B --> C
     W --> C
@@ -116,32 +123,37 @@ merkle root) and to the nonce that satisfies the proof-of-work target
 
 ```mermaid
 flowchart TB
-    subgraph Header["Hashed header"]
-        prev["prev_hash"]
-        root["merkle root of transaction ids"]
-        ts["timestamp"]
-        diff["difficulty"]
-        nonce["nonce"]
-        ver["version"]
+    subgraph Header["Block Header"]
+        direction TB
+        prev["Previous Block Hash"]
+        root["Merkle Root<br/>(Transaction IDs)"]
+        ts["Timestamp"]
+        diff["Difficulty Target"]
+        nonce["Nonce"]
+        ver["Version"]
     end
+
     prev --> H{{"SHA-256"}}
     root --> H
     ts --> H
     diff --> H
     nonce --> H
     ver --> H
-    H --> out["block hash<br/>must start with 0000"]
+
+    H --> out["Block Hash<br/>Must satisfy difficulty target"]
 ```
 
 Transactions are folded into the root pairwise:
 
 ```mermaid
 flowchart BT
-    t1["tx 1"] --> h12["H(1 + 2)"]
-    t2["tx 2"] --> h12
-    t3["tx 3"] --> h34["H(3 + 4)"]
-    t4["tx 4"] --> h34
-    h12 --> root["merkle root"]
+    t1["Transaction 1"] --> h12["Hash(H1 + H2)"]
+    t2["Transaction 2"] --> h12
+
+    t3["Transaction 3"] --> h34["Hash(H3 + H4)"]
+    t4["Transaction 4"] --> h34
+
+    h12 --> root["Merkle Root"]
     h34 --> root
 ```
 
@@ -152,8 +164,8 @@ every hash after it
 
 ```mermaid
 flowchart RL
-    B2["Block 2"] -. prev_hash .-> B1["Block 1"]
-    B1 -. prev_hash .-> G["Block 0<br/>genesis"]
+    B2["Block 2"] -.->|"prev_hash = Hash(Block 1)"| B1["Block 1"]
+    B1 -.->|"prev_hash = Hash(Block 0)"| G["Block 0<br/>(Genesis Block)"]
 ```
 
 ### Proof of work
@@ -163,12 +175,14 @@ header hash is recomputed per attempt
 
 ```mermaid
 flowchart TD
-    A(["Collect transactions"]) --> B["Compute merkle root once"]
-    B --> C["Hash header with current nonce"]
-    C --> D{"Hash starts with<br/>0000?"}
-    D -- no --> E["nonce += 1"]
+    A(["Collect Transactions"]) --> B["Compute Merkle Root Once"]
+    B --> C["Serialize Block Header and Hash<br/>with Current Nonce"]
+    C --> D{"Does Hash Meet<br/>Difficulty Target?"}
+
+    D -- No --> E["Increment Nonce"]
     E --> C
-    D -- yes --> F(["Store block and move chain head"])
+
+    D -- Yes --> F(["Store Block<br/>and Update Chain Head"])
 ```
 
 ### Transactions and the UTXO model
@@ -178,15 +192,18 @@ and creates new ones; whatever is not sent comes back as a change output
 
 ```mermaid
 flowchart LR
-    subgraph Before
-        G0["genesis output 0<br/>100 to Alice"]
+    subgraph Before["Before Transaction"]
+        G0["Genesis Output 0<br/>100 units → Alice"]
     end
-    TX[["transfer<br/>signed by Alice"]]
-    subgraph After
-        O1["output 0<br/>10 to Bob"]
-        O2["output 1<br/>90 to Alice (change)"]
+
+    TX[["Transfer Transaction<br/>Signed by Alice"]]
+
+    subgraph After["After Transaction"]
+        O1["Output 0<br/>10 units → Bob"]
+        O2["Output 1<br/>90 units → Alice<br/>(Change)"]
     end
-    G0 -- "spent by" --> TX
+
+    G0 -->|"Consumed as input"| TX
     TX --> O1
     TX --> O2
 ```
@@ -225,10 +242,13 @@ bincode-encoded `Message`, and the sender closing the socket ends the frame
 
 ```mermaid
 flowchart LR
-    Client["Wallet client<br/>send --node"] -->|Tx| Seed["Seed node<br/>127.0.0.1:3000<br/>relay only"]
-    Seed -->|"Inventory (tx)"| Miner["Miner node<br/>--miner ADDRESS"]
-    Miner -->|"Inventory (block)"| Seed
-    Seed -->|"Inventory (block)"| Other["Other nodes"]
+    Client["Wallet Client<br/>send --node"] -->|"Transaction (Tx)"| Seed["Seed Node<br/>127.0.0.1:3000<br/>(Relay Only)"]
+
+    Seed -->|"Inventory: Transaction"| Miner["Miner Node<br/>--miner ADDRESS"]
+
+    Miner -->|"Inventory: Block"| Seed
+
+    Seed -->|"Inventory: Block"| Other["Other Nodes"]
 ```
 
 ### Joining and syncing
