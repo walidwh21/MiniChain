@@ -1,0 +1,22 @@
+name: Close stale issues
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: 'More information is needed for this issue. Please add details or it will be closed in 7 days.'
+          close-issue-message: 'Closed because the requested information was not provided.'
+          stale-issue-label: 'stale'
+          any-of-labels: 'needs-info'
+          days-before-issue-stale: 6
+          days-before-issue-close: 7

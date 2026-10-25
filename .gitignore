@@ -1,0 +1,12 @@
+# Build output
+/target/
+**/*.rs.bk
+
+# Local node data (default and per-node directories)
+/data/
+/data-*/
+
+# Editors and OS files
+/.idea
+/.vscode
+.DS_Store

@@ -1,0 +1,7 @@
+$ minichain send 3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe 3u3fh473HTXEY32kMFRbWJeMF9WWi4QKFg 10
+mined block #1 (0000c5f8229aab55e9f855173ef94485aab8497eea0588f365c871d6d0561722)
+sent 10 from 3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe to 3u3fh473HTXEY32kMFRbWJeMF9WWi4QKFg
+$ minichain balance 3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe
+balance of 3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe: 190
+$ minichain balance 3u3fh473HTXEY32kMFRbWJeMF9WWi4QKFg
+balance of 3u3fh473HTXEY32kMFRbWJeMF9WWi4QKFg: 10

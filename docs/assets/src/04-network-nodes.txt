@@ -1,0 +1,13 @@
+-- terminal 1: seed node (relay only) ------------------------------------------
+$ RUST_LOG=info minichain node start 3000
+[2026-10-25T09:14:02Z INFO  minichain::net::peer] listening on 127.0.0.1:3000
+[2026-10-25T09:14:09Z INFO  minichain::net::handlers] hello from 127.0.0.1:3001 (height 0)
+[2026-10-25T09:14:31Z INFO  minichain::net::handlers] transaction 04cc8607..1b00b986 from ""
+-- terminal 2: miner node ---------------------------------------------------------
+$ MINICHAIN_DATA=data-miner RUST_LOG=info minichain node start 3001 --miner 3u3fh473HTXEY32kMFRbWJeMF9WWi4QKFg
+[2026-10-25T09:14:09Z INFO  minichain::net::peer] listening on 127.0.0.1:3001
+[2026-10-25T09:14:31Z INFO  minichain::net::handlers] transaction 04cc8607..1b00b986 from "127.0.0.1:3000"
+[2026-10-25T09:14:31Z INFO  minichain::chain::ledger] mining block #1 with 2 transactions
+-- terminal 3: wallet client --------------------------------------------------------
+$ minichain send 3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe 3u3fh473HTXEY32kMFRbWJeMF9WWi4QKFg 10 --node 127.0.0.1:3000
+transaction 04cc8607163330df2b6cad9eafef1c12fc8fa01f2292252a3703fc861b00b986 submitted to 127.0.0.1:3000

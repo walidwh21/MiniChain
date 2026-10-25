@@ -1,0 +1,24 @@
+$ minichain chain show
+Block #1
+  hash       0000c5f8229aab55e9f855173ef94485aab8497eea0588f365c871d6d0561722
+  prev       0000ad4a796fcc2e15dc4c6061b45ed9b373f26adfc798ca7d2d8cc58182718e
+  timestamp  1793000412873 ms
+  nonce      48213   difficulty 4
+  transactions (2)
+    [coinbase] e3a516cb..6262101a
+        memo  mining reward [9c41b7e0a25d3f18]
+        out    100  ->  3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe
+    [transfer] 04cc8607..1b00b986
+        in    0ccfa452..890d6efd:0  signed by 3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe
+        out     10  ->  3u3fh473HTXEY32kMFRbWJeMF9WWi4QKFg
+        out     90  ->  3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe
+
+Block #0
+  hash       0000ad4a796fcc2e15dc4c6061b45ed9b373f26adfc798ca7d2d8cc58182718e
+  prev       (genesis)
+  timestamp  1793000398120 ms
+  nonce      15156   difficulty 4
+  transactions (1)
+    [coinbase] 0ccfa452..890d6efd
+        memo  genesis block [51d0e8a3b6c7f294]
+        out    100  ->  3URrFDkodyV5uzTQArm94NVRhq5Peg6mXe
