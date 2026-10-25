@@ -394,3 +394,9 @@ index rebuilds). `scripts/format.sh` runs `rustfmt` and `clippy`
 - [Bitcoin Wiki](https://wiki.bitcoinsv.io)
 - [Awesome Blockchain Rust](https://github.com/rust-in-blockchain/awesome-blockchain-rust)
 - [Complete binary merkle trees explained](https://medium.com/coinmonks/merkle-tree-a-simple-explanation-and-implementation-48903442bc08)
+
+
+```mermaid
+graph TD
+    A --> B
+```
