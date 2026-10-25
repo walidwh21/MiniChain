@@ -35,7 +35,9 @@ fn command_tree() -> Command {
             Command::new("wallet")
                 .about("Manage local key pairs")
                 .subcommand_required(true)
-                .subcommand(Command::new("create").about("Generate a key pair and print its address"))
+                .subcommand(
+                    Command::new("create").about("Generate a key pair and print its address"),
+                )
                 .subcommand(Command::new("list").about("List the addresses in the local keystore")),
         )
         .subcommand(
@@ -45,7 +47,10 @@ fn command_tree() -> Command {
                 .subcommand(
                     Command::new("init")
                         .about("Create a new chain; the genesis reward goes to ADDRESS")
-                        .arg(positional("address", "Address that receives the genesis reward")),
+                        .arg(positional(
+                            "address",
+                            "Address that receives the genesis reward",
+                        )),
                 )
                 .subcommand(Command::new("show").about("Print every block, newest first")),
         )
@@ -57,7 +62,10 @@ fn command_tree() -> Command {
         .subcommand(
             Command::new("send")
                 .about("Send coins; mines a block locally unless --node is given")
-                .arg(positional("from", "Sender address (needs a key in the local keystore)"))
+                .arg(positional(
+                    "from",
+                    "Sender address (needs a key in the local keystore)",
+                ))
                 .arg(positional("to", "Recipient address"))
                 .arg(positional("amount", "Number of coins"))
                 .arg(
@@ -190,7 +198,10 @@ fn run_utxo(sub: &ArgMatches) -> Result<()> {
             let ledger = Ledger::load(&store)?;
             let utxo = UtxoSet::new(&store, ledger)?;
             let indexed = utxo.rebuild()?;
-            println!("index rebuilt: {} transactions with unspent outputs", indexed);
+            println!(
+                "index rebuilt: {} transactions with unspent outputs",
+                indexed
+            );
             Ok(())
         }
         _ => err("unknown utxo command"),

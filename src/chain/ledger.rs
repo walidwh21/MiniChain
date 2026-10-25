@@ -156,7 +156,10 @@ impl Ledger {
         }
         for tx in block.transactions() {
             if !self.verify_tx(tx)? {
-                return err(format!("block {} holds an invalid transaction", block.hash()));
+                return err(format!(
+                    "block {} holds an invalid transaction",
+                    block.hash()
+                ));
             }
         }
         self.store_block(&block)?;
@@ -190,7 +193,11 @@ impl Ledger {
             None => return err("chain is empty"),
         };
         let height = self.best_height()? + 1;
-        info!("mining block #{} with {} transactions", height, transactions.len());
+        info!(
+            "mining block #{} with {} transactions",
+            height,
+            transactions.len()
+        );
         let block = Block::mine(transactions, head, height)?;
         self.store_block(&block)?;
         self.set_head(block.hash())?;

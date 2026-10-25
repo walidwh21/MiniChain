@@ -84,7 +84,9 @@ impl Peer {
     }
 
     pub(super) fn state(&self) -> MutexGuard<'_, State> {
-        self.state.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+        self.state
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
     }
 
     pub(super) fn known_peers(&self) -> Vec<String> {

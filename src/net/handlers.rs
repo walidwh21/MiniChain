@@ -1,8 +1,6 @@
 //! Reactions to inbound messages, plus the mining trigger.
 
-use super::message::{
-    BlockMsg, GetBlocks, GetItem, Hello, Inventory, ItemKind, Message, TxMsg,
-};
+use super::message::{BlockMsg, GetBlocks, GetItem, Hello, Inventory, ItemKind, Message, TxMsg};
 use super::peer::Peer;
 use crate::chain::Transaction;
 use crate::config::SEED_NODE;

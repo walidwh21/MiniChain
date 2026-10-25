@@ -38,8 +38,8 @@ fn print_tx(tx: &Transaction) {
     } else {
         println!("    [transfer] {}", abbreviate(&tx.id));
         for input in &tx.inputs {
-            let signer = encode_address(&input.signer_hash())
-                .unwrap_or_else(|_| String::from("<invalid>"));
+            let signer =
+                encode_address(&input.signer_hash()).unwrap_or_else(|_| String::from("<invalid>"));
             println!(
                 "        in    {}:{}  signed by {}",
                 abbreviate(&input.prev_txid),
@@ -49,8 +49,8 @@ fn print_tx(tx: &Transaction) {
         }
     }
     for output in &tx.outputs {
-        let owner = encode_address(&output.pubkey_hash)
-            .unwrap_or_else(|_| String::from("<invalid>"));
+        let owner =
+            encode_address(&output.pubkey_hash).unwrap_or_else(|_| String::from("<invalid>"));
         println!("        out   {:>4}  ->  {}", output.value, owner);
     }
 }

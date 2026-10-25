@@ -11,7 +11,9 @@ pub struct Keystore {
 
 impl Keystore {
     pub fn open(store: &Store) -> Result<Keystore> {
-        Ok(Keystore { tree: store.keys()? })
+        Ok(Keystore {
+            tree: store.keys()?,
+        })
     }
 
     /// Generates a key pair, saves it and returns the new address.

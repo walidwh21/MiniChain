@@ -19,7 +19,9 @@ impl Store {
     }
 
     pub fn open_at(path: &str) -> Result<Store> {
-        Ok(Store { db: sled::open(path)? })
+        Ok(Store {
+            db: sled::open(path)?,
+        })
     }
 
     /// Block hash -> serialized block.

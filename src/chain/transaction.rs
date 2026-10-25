@@ -135,7 +135,9 @@ impl Transaction {
                 let input = &self.inputs[index];
                 let source = match prev.get(&input.prev_txid) {
                     Some(source) => source,
-                    None => return err(format!("unknown previous transaction {}", input.prev_txid)),
+                    None => {
+                        return err(format!("unknown previous transaction {}", input.prev_txid))
+                    }
                 };
                 match usize::try_from(input.prev_index)
                     .ok()
