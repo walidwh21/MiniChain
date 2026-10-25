@@ -23,13 +23,14 @@ proof-of-work block, a persistent ledger, and a small peer-to-peer layer
 ## Architecture
 
 ```mermaid
+
 flowchart LR
     subgraph Front["Frontend"]
         CLI["CLI"]
     end
 
     subgraph Domain["Domain Layer"]
-        W["Wallet<br/>Keypair / Keystore"]
+        W["Wallet: Keypair / Keystore"]
         L["chain::Ledger"]
         U["chain::UtxoSet"]
         B["chain::Block"]
@@ -40,7 +41,7 @@ flowchart LR
         P["net::Peer"]
     end
 
-    S[("Persistent Store<br/>(sled)")]
+    S[("Persistent Store: sled")]
     C["Cryptography"]
 
     CLI --> W
@@ -62,6 +63,7 @@ flowchart LR
     T --> C
     B --> C
     W --> C
+
 ```
 
 Everything persistent lives in one `sled` database made of four trees
@@ -126,7 +128,7 @@ flowchart TB
     subgraph Header["Block Header"]
         direction TB
         prev["Previous Block Hash"]
-        root["Merkle Root<br/>(Transaction IDs)"]
+        root["Merkle Root (Transaction IDs)"]
         ts["Timestamp"]
         diff["Difficulty Target"]
         nonce["Nonce"]
@@ -140,18 +142,23 @@ flowchart TB
     nonce --> H
     ver --> H
 
-    H --> out["Block Hash<br/>Must satisfy difficulty target"]
+    H --> out["Block Hash - Must satisfy difficulty target"]
 ```
 
 Transactions are folded into the root pairwise:
 
 ```mermaid
 flowchart BT
-    t1["Transaction 1"] --> h12["Hash(H1 + H2)"]
-    t2["Transaction 2"] --> h12
+    t1["Transaction 1"] --> h1["Hash H1"]
+    t2["Transaction 2"] --> h2["Hash H2"]
+    t3["Transaction 3"] --> h3["Hash H3"]
+    t4["Transaction 4"] --> h4["Hash H4"]
 
-    t3["Transaction 3"] --> h34["Hash(H3 + H4)"]
-    t4["Transaction 4"] --> h34
+    h1 --> h12["Hash H1 + H2"]
+    h2 --> h12
+
+    h3 --> h34["Hash H3 + H4"]
+    h4 --> h34
 
     h12 --> root["Merkle Root"]
     h34 --> root
@@ -165,7 +172,7 @@ every hash after it
 ```mermaid
 flowchart RL
     B2["Block 2"] -.->|"prev_hash = Hash(Block 1)"| B1["Block 1"]
-    B1 -.->|"prev_hash = Hash(Block 0)"| G["Block 0<br/>(Genesis Block)"]
+    B1 -.->|"prev_hash = Hash(Block 0)"| G["Block 0 (Genesis Block)"]
 ```
 
 ### Proof of work
@@ -176,13 +183,13 @@ header hash is recomputed per attempt
 ```mermaid
 flowchart TD
     A(["Collect Transactions"]) --> B["Compute Merkle Root Once"]
-    B --> C["Serialize Block Header and Hash<br/>with Current Nonce"]
-    C --> D{"Does Hash Meet<br/>Difficulty Target?"}
+    B --> C["Serialize Block Header and Hash with Current Nonce"]
+    C --> D{"Does Hash Meet Difficulty Target?"}
 
     D -- No --> E["Increment Nonce"]
     E --> C
 
-    D -- Yes --> F(["Store Block<br/>and Update Chain Head"])
+    D -- Yes --> F(["Store Block and Update Chain Head"])
 ```
 
 ### Transactions and the UTXO model
@@ -193,14 +200,14 @@ and creates new ones; whatever is not sent comes back as a change output
 ```mermaid
 flowchart LR
     subgraph Before["Before Transaction"]
-        G0["Genesis Output 0<br/>100 units → Alice"]
+        G0["Genesis Output 0: 100 units to Alice"]
     end
 
-    TX[["Transfer Transaction<br/>Signed by Alice"]]
+    TX[["Transfer Transaction (Signed by Alice)"]]
 
     subgraph After["After Transaction"]
-        O1["Output 0<br/>10 units → Bob"]
-        O2["Output 1<br/>90 units → Alice<br/>(Change)"]
+        O1["Output 0: 10 units to Bob"]
+        O2["Output 1: 90 units to Alice (Change)"]
     end
 
     G0 -->|"Consumed as input"| TX
@@ -219,15 +226,20 @@ sequenceDiagram
     participant U as UtxoSet
     participant L as Ledger
     participant M as Miner
+
     S->>U: collect_spendable(pubkey_hash, amount)
-    U-->>S: outputs covering the amount
-    S->>S: build inputs, payment and change outputs
-    S->>L: sign_tx (looks up the spent transactions)
-    L-->>S: one signature per input
-    S->>M: signed transaction
+    U-->>S: Return outputs covering the amount
+
+    S->>S: Build inputs, payment and change outputs
+    S->>L: sign_tx (look up spent transactions)
+    L-->>S: Return one signature per input
+
+    S->>M: Submit signed transaction
     M->>L: verify_tx
-    Note over M,L: id matches, key hashes to the locked output,<br/>signature valid, inputs cover outputs
-    M->>M: mine block [coinbase, transaction]
+
+    Note over M,L: Check transaction ID, public key hash,<br/>signature validity and input/output values
+
+    M->>M: Mine block (coinbase + transaction)
     M->>U: apply_block
 ```
 
@@ -242,9 +254,9 @@ bincode-encoded `Message`, and the sender closing the socket ends the frame
 
 ```mermaid
 flowchart LR
-    Client["Wallet Client<br/>send --node"] -->|"Transaction (Tx)"| Seed["Seed Node<br/>127.0.0.1:3000<br/>(Relay Only)"]
+    Client["Wallet Client: send --node"] -->|"Transaction (Tx)"| Seed["Seed Node: 127.0.0.1:3000 (Relay Only)"]
 
-    Seed -->|"Inventory: Transaction"| Miner["Miner Node<br/>--miner ADDRESS"]
+    Seed -->|"Inventory: Transaction"| Miner["Miner Node: --miner ADDRESS"]
 
     Miner -->|"Inventory: Block"| Seed
 
@@ -255,18 +267,22 @@ flowchart LR
 
 ```mermaid
 sequenceDiagram
-    participant N as New node
-    participant S as Seed node
+    participant N as New Node
+    participant S as Seed Node
+
     N->>S: Hello (height 0)
     S->>N: Hello (height 5)
     S->>N: Peers
+
     N->>S: GetBlocks
     S->>N: Inventory (block hashes)
-    loop until the queue is empty
-        N->>S: GetItem (next block, oldest first)
+
+    loop Until the queue is empty
+        N->>S: GetItem (next oldest block)
         S->>N: Block
     end
-    N->>N: rebuild UTXO index
+
+    N->>N: Rebuild UTXO index
 ```
 
 | Message | Purpose |
